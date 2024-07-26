@@ -22,9 +22,11 @@ export const signup = async (req, res, next) => {
 
         value.password = hashedPassword;
 
-        const newUser = await UserModel.create(value);
+        await UserModel.create(value);
 
-        res.status(201).send(newUser);
+        res.status(201).json({ message: "Registration successful!" });
+
+        const hello = usersSchema.validate()
 
     } catch (error) {
         next(error);
