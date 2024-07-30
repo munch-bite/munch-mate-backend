@@ -65,7 +65,7 @@ export const login = async (req, res, next) => {
 
         // log user in
         res.status(200).json({ message: "User logged in" });
-        
+
     } catch (error) {
         next(error);
     }
@@ -75,7 +75,7 @@ export const token = async (req, res, next) => {
     try {
         const { error, value } = usersSchema.validate(req.body);
 
-        if(error) {
+        if (error) {
             return res.status(400).send(error.details[0].message);
         }
 
@@ -93,15 +93,15 @@ export const token = async (req, res, next) => {
 
         const correctPassword = bcrypt.compare(value.password, user.password)
 
-        if(!correctPassword) {
-            return res.status(400).json({ message: "Invalid login credentials"})
+        if (!correctPassword) {
+            return res.status(400).json({ message: "Invalid login credentials" })
         }
 
         // create a token
         const token = jwt.sign(
-            { id: user.id},
+            { id: user.id },
             process.env.JWT_PRIVATE_KEY,
-            { expiresIn: "120h"}
+            { expiresIn: process.env.TOKEN_EXPIRY }
         )
 
         // log user in
@@ -111,6 +111,6 @@ export const token = async (req, res, next) => {
         })
 
     } catch (error) {
-        
+        next(error)
     }
 }
