@@ -1,42 +1,68 @@
 import { UserModel } from "../models/usersModel.js"
-import jwt from "jsonwebtoken;"
+import jwt from "jsonwebtoken";
 
 export const isAuthenticated = async (req, res, next) => {
     try {
-        // check if session has a user
-        if(req.session.user) {
-            // check if user exists in the database
+        if (req.session?.user) {
+
             const user = await UserModel.findById(req.session.user.id);
 
-            if(!user) {
-                return res.status(400).json({ message: "User does not exist"});
+            if (!user) {
+                return res.status(400).json({ message: "User does not exist" });
             }
+
+            req.user = user;
 
             next();
         } else if (req.headers.authorization) {
-           try {
-             //extract token from headers
-             const token = req.headers.authorization.split("")[1];
+            try {
+                const token = req.headers.authorization.split(" ")[1];
 
-             // verify token to get user and append request
-             req.user = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
- 
-             // check if user exists in the database
-             const user = await UserModel.findById(req.user.id)
- 
-             if(!user) {
-                 return res.status(400).json({ message: "User does not exist" });
-             }
-             
-             next();
-           } catch (error) {
-             res.status(401).json(error);
-           }
+                const decoded = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
+
+                const user = await UserModel.findById(decoded.id);
+
+                if (!user) {
+                    return res.status(400).json({ message: "User does not exist" });
+                }
+
+                req.user = user;
+
+                next();
+            } catch (error) {
+                res.status(401).json({ message: "Invalid token", error });
+            }
         } else {
             res.status(401).json({ message: "Not Authenticated" });
         }
 
     } catch (error) {
         next(error);
+    }
+}
+
+export const vendorPermission = async (req, res, next) => {
+    try {
+        if (req.user && req.user.role === "vendor") {
+            next()
+        } else {
+            res.status(401)
+            throw new Error("Not authorized as a vendor");
+        }
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const customerPermission = async (req, res, next) => {
+    try {
+        if (req.user && req.user.role === "customer") {
+            next()
+        } else {
+            res.status(401)
+            throw new Error("Not authorized as a customer");
+        }
+    } catch (error) {
+        next(error)
     }
 }
