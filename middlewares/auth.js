@@ -1,5 +1,6 @@
 import { UserModel } from "../models/usersModel.js"
 import jwt from "jsonwebtoken";
+import { VendorsModel } from "../models/vendorsModel.js";
 
 export const isAuthenticated = async (req, res, next) => {
     try {
@@ -20,7 +21,7 @@ export const isAuthenticated = async (req, res, next) => {
 
                 const decoded = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
 
-                const user = await UserModel.findById(decoded.id);
+                const user = await UserModel.findById(decoded.id) || await VendorsModel.findById(decoded.id);
 
                 if (!user) {
                     return res.status(400).json({ message: "User does not exist" });
