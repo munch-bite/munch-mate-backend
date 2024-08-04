@@ -19,7 +19,7 @@ export const addFoodItem = async (req, res, next) => {
         const findVendor = await VendorsModel.findById(vendorSessionID);
 
         if (!findVendor) {
-            return res.status(401).send("Vendor not found");
+            return res.status(404).json({ message: "Vendor not found" });
         }
 
         // create new food item

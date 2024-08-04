@@ -51,7 +51,7 @@ export const login = async (req, res, next) => {
         })
 
         if (!vendor) {
-            return res.status(400).json({ message: "Vendor does not exist, try signing up" });
+            return res.status(404).json({ message: "Vendor does not exist, try signing up" });
         }
 
         const correctPassword = await bcrypt.compare(value.password, vendor.password)

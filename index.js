@@ -7,6 +7,7 @@ import "dotenv/config";
 import usersRoute from "./routes/usersRoute.js";
 import foodItemsRouter from "./routes/foodItemsRoute.js";
 import vendorsRouter from "./routes/vendorsRoute.js";
+import ordersRouter from "./routes/ordersRoute.js";
 
 await mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("Mongo DB connected"))
@@ -34,6 +35,7 @@ app.use(session({
 app.use("/api/v1", usersRoute);
 app.use("/api/v1", vendorsRouter);
 app.use("/api/v1", foodItemsRouter);
+app.use("/api/v1", ordersRouter);
 
 const port = process.env.PORT || 8080;
 
