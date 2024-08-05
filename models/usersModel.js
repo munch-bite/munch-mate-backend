@@ -9,7 +9,7 @@ const usersModel = new Schema({
     email: { type: String, required: true, unique: true, lowercase: true },
     phoneNumber: { type: String },
     password: { type: String, required: true },
-    role: { type: String, enum: ["customer", "vendor"], default: "customer", required: true },
+    role: { type: String, enum: ["customer"], default: "customer", required: true },
     resetToken: { type: String }
 }, {
     timestamps: true
