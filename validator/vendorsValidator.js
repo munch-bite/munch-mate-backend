@@ -4,11 +4,12 @@ export const vendorsSchema = joi.object({
     firstName: joi.string().min(1).max(25).required(),
     middleName: joi.string().max(25),
     lastName: joi.string().min(1).max(25).required(),
-    otherNames: joi.string().max(20),
-    userName: joi.string().min(3).max(20).lowercase().required(),
-    phoneNumber: joi.string(),
+    businessName: joi.string().min(3).max(50).required(),
+    address: joi.string(),
+    location: joi.string().required(),
     email: joi.string().email().required(),
-    role: joi.string().valid("customer", "vendor").default("vendor"),
+    phoneNumber: joi.string(),
+    role: joi.string().valid("vendor").default("vendor"),
     password: joi.string().min(4).required(),
     confirmPassword: joi.ref("password")
 }).with("password", "confirmPassword");
