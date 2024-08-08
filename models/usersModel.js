@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 
 
-const usersModel = new Schema({
+const usersSchema = new Schema({
     firstName: { type: String, required: true },
     middleName: { type: String },
     lastName: { type: String, required: true },
@@ -15,4 +15,4 @@ const usersModel = new Schema({
     timestamps: true
 });
 
-export const UserModel = model("User", usersModel);
+export const UserModel = model("User", usersSchema);

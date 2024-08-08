@@ -3,10 +3,10 @@ import { confirmPayment, placedOrder } from "../controllers/ordersController.js"
 import { customerPermission, isAuthenticated } from "../middlewares/auth.js";
 
 
-const ordersRouter = Router();
+const ordersRoute = Router();
 
-ordersRouter.post("/orders/place-order", isAuthenticated, customerPermission, placedOrder);
+ordersRoute.post("/orders/place-order", isAuthenticated, customerPermission, placedOrder);
 
-ordersRouter.post("/orders/confirm-payment", isAuthenticated, customerPermission, confirmPayment);
+ordersRoute.post("/orders/confirm-payment", isAuthenticated, customerPermission, confirmPayment);
 
-export default ordersRouter;
+export default ordersRoute;

@@ -1,6 +1,6 @@
 import joi from "joi";
 
-export const usersSchema = joi.object({
+export const usersValidator = joi.object({
     firstName: joi.string().required(),
     middleName: joi.string(),
     lastName: joi.string().required(),

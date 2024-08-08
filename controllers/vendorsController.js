@@ -1,12 +1,12 @@
 import { VendorsModel } from "../models/vendorsModel.js";
-import { vendorsSchema } from "../validator/vendorsValidator.js";
+import { vendorsValidator } from "../validators/vendorsValidator.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 
 export const signup = async (req, res, next) => {
     try {
-        const { error, value } = vendorsSchema.validate(req.body);
+        const { error, value } = vendorsValidator.validate(req.body);
 
         if (error) {
             return res.status(400).send(error.details[0].message);
@@ -36,7 +36,7 @@ export const signup = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     try {
-        const { error, value } = vendorsSchema.validate(req.body)
+        const { error, value } = vendorsValidator.validate(req.body)
 
         if (error) {
             return res.status(400).send(error.details[0].message)
@@ -73,7 +73,7 @@ export const login = async (req, res, next) => {
 
 export const token = async (req, res, next) => {
     try {
-        const { error, value } = vendorsSchema.validate(req.body);
+        const { error, value } = vendorsValidator.validate(req.body);
 
         if (error) {
             return res.status(400).send(error.details[0].message);

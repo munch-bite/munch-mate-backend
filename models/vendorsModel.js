@@ -1,7 +1,7 @@
 import { model, Schema, Types } from "mongoose";
 
 
-const vendorsModel = new Schema({
+const vendorsSchema = new Schema({
     firstName: { type: String, trim: true, required: true },
     middleName: { type: String, trim: true },
     lastName: { type: String, trim: true, required: true },
@@ -17,4 +17,4 @@ const vendorsModel = new Schema({
     timestamps: true
 });
 
-export const VendorsModel = model("Vendor", vendorsModel);
+export const VendorsModel = model("Vendor", vendorsSchema);

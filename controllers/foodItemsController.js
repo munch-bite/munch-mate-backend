@@ -1,6 +1,6 @@
 import { FoodItemsModel } from "../models/foodItemsModel.js";
 import { VendorsModel } from "../models/vendorsModel.js";
-import { foodItemsValidator } from "../validator/foodItemsValidator.js";
+import { foodItemsValidator } from "../validators/foodItemsValidator.js";
 
 
 export const addFoodItem = async (req, res, next) => {
