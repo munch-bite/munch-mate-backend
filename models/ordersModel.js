@@ -1,7 +1,7 @@
 import { model, Schema, Types } from "mongoose";
 
 
-const ordersModel = new Schema({
+const ordersSchema = new Schema({
     user: { type: Types.ObjectId, ref: "User", required: true },
     vendor: { type: Types.ObjectId, ref: "Vendor", required: true },
     foodItem: [{ type: Types.ObjectId, ref: "FoodItem", required: true }],
@@ -12,4 +12,4 @@ const ordersModel = new Schema({
     timestamps: true
 })
 
-export const OrdersModel = model("Order", ordersModel);
+export const OrdersModel = model("Order", ordersSchema);

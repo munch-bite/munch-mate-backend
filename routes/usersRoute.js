@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { login, signup, token } from "../controllers/userController.js";
+import { login, logout, signup, token } from "../controllers/usersController.js";
 
-const usersRouter = Router();
+const usersRoute = Router();
 
-usersRouter.post("/users/auth/signup", signup);
-usersRouter.post("/users/auth/login", login);
-usersRouter.post("/users/auth/token", token);
+usersRoute.post("/users/auth/signup", signup);
+usersRoute.post("/users/auth/login", login);
+usersRoute.post("/users/auth/token", token);
+usersRoute.post("/users/auth/token", logout);
 
-export default usersRouter;
+export default usersRoute;

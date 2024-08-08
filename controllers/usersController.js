@@ -1,12 +1,12 @@
 import { UserModel } from "../models/usersModel.js";
-import { usersSchema } from "../validator/userSchema.js";
+import { usersValidator } from "../validators/usersValidator.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 
 export const signup = async (req, res, next) => {
     try {
-        const { error, value } = usersSchema.validate(req.body);
+        const { error, value } = usersValidator.validate(req.body);
 
         if (error) {
             return res.status(400).send(error.details[0].message);
@@ -36,7 +36,7 @@ export const signup = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     try {
-        const { error, value } = usersSchema.validate(req.body)
+        const { error, value } = usersValidator.validate(req.body)
 
         if (error) {
             return res.status(400).send(error.details[0].message)
@@ -73,7 +73,7 @@ export const login = async (req, res, next) => {
 
 export const token = async (req, res, next) => {
     try {
-        const { error, value } = usersSchema.validate(req.body);
+        const { error, value } = usersValidator.validate(req.body);
 
         if (error) {
             return res.status(400).send(error.details[0].message);
@@ -112,5 +112,16 @@ export const token = async (req, res, next) => {
 
     } catch (error) {
         next(error)
+    }
+}
+
+export const logout = async (req, res) => {
+    try {
+        await req.session.destroy();
+
+        res.status(200).json({ message: "User successfully logged out" })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 }

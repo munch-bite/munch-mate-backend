@@ -1,6 +1,6 @@
 import joi from "joi";
 
-export const vendorsSchema = joi.object({
+export const vendorsValidator = joi.object({
     firstName: joi.string().min(1).max(25).required(),
     middleName: joi.string().max(25),
     lastName: joi.string().min(1).max(25).required(),

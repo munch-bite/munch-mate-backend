@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { login, signup, token } from "../controllers/vendorsController.js";
 
-const vendorsRouter = Router();
+const vendorsRoute = Router();
 
-vendorsRouter.post("/vendors/auth/signup", signup);
-vendorsRouter.post("/vendors/auth/login", login);
-vendorsRouter.post("/vendors/auth/token", token);
+vendorsRoute.post("/vendors/auth/signup", signup);
+vendorsRoute.post("/vendors/auth/login", login);
+vendorsRoute.post("/vendors/auth/token", token);
 
-export default vendorsRouter;
+export default vendorsRoute;

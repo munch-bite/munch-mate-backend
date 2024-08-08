@@ -1,10 +1,9 @@
-import Stripe from "stripe";
-import { ordersValidator } from "../validator/ordersValidator.js";
+import { ordersValidator } from "../validators/ordersValidator.js";
 import { UserModel } from "../models/usersModel.js";
 import { OrdersModel } from "../models/ordersModel.js";
+import https from "https";
 
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const placedOrder = async (req, res, next) => {
     try {
@@ -16,56 +15,58 @@ export const placedOrder = async (req, res, next) => {
 
         const userSessionID = req.session?.user?.id || req.user?.id;
 
-        const findUser = await UserModel.findById(userSessionID);
+        const user = await UserModel.findById(userSessionID);
 
-        if (!findUser) {
+        if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
 
-        const newOrder = await OrdersModel.create({
+        await OrdersModel.create({
             ...value,
             user: userSessionID
         })
-
-        await newOrder.save();
 
         // res.status(201).json({ message: "Order created" });
 
         // after order has been placed user's cart has to be cleared
         await UserModel.findByIdAndUpdate(userSessionID, { cartData: {} });
 
-        const line_items = value.foodItem.map((item) => ({
-            price_data: {
-                currency: "usd",
-                product_data: {
-                    name: item.name
-                },
-                unit_amount: item.price * 100
-            },
-            quantity: item.quantity
-        }));
-
-        // to add delivery charges
-        line_items.push({
-            price_data: {
-                currency: "usd",
-                product_data: {
-                    name: "Delivery Charges"
-                },
-                unit_amount: 2 * 100
-            },
-            quantity: 1
+        // initialize transaction
+        const params = JSON.stringify({
+            "email": user.email,
+            "amount": "1000"
         })
 
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
-            line_items,
-            mode: "payment",
-            success_url: `${frontend_url}/verify?success=true&orderID=${newOrder._id}`,
-            cancel_url: `${frontend_url}/verify?success=false&orderID=${newOrder._id}`
+        const options = {
+            hostname: 'api.paystack.co',
+            port: 443,
+            path: '/transaction/initialize',
+            method: 'POST',
+            headers: {
+                Authorization: process.env.PAYSTACK_SECRET_KEY,
+                'Content-Type': 'application/json'
+            }
+        }
+
+        //initialize Paystack transaction
+        const req = https.request(options, res => {
+            let data = ''
+
+            res.on('data', (chunk) => {
+                data += chunk
+            });
+
+            res.on('end', () => {
+                console.log(JSON.parse(data))
+            })
+        }).on('error', error => {
+            console.error(error)
         })
 
-        res.status(200).json({ url: session.url })
+        req.write(params)
+        req.end()
+
+
 
     } catch (error) {
         next(error);
@@ -102,3 +103,37 @@ export const confirmPayment = async (req, res, next) => {
         next(error);
     }
 };
+
+// export const verifyPayment = async (req, res, next) => {
+//     try {
+
+//     } catch (error) {
+
+//     }
+// }
+
+// const https = require('https')
+
+// const options = {
+//     hostname: 'api.paystack.co',
+//     port: 443,
+//     path: '/transaction/verify/:reference',
+//     method: 'GET',
+//     headers: {
+//         Authorization: 'Bearer SECRET_KEY'
+//     }
+// }
+
+// https.request(options, res => {
+//     let data = ''
+
+//     res.on('data', (chunk) => {
+//         data += chunk
+//     });
+
+//     res.on('end', () => {
+//         console.log(JSON.parse(data))
+//     })
+// }).on('error', error => {
+//     console.error(error)
+// })

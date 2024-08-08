@@ -1,7 +1,7 @@
 import { model, Schema, Types } from "mongoose";
 
 
-const foodItemsModel = new Schema({
+const foodItemsSchema = new Schema({
     image: { type: String },
     name: { type: String, required: true },
     price: { type: String, required: true },
@@ -12,4 +12,4 @@ const foodItemsModel = new Schema({
     timestamps: true
 })
 
-export const FoodItemsModel = model("FoodItem", foodItemsModel);
+export const FoodItemsModel = model("FoodItem", foodItemsSchema);
