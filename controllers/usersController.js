@@ -12,11 +12,15 @@ export const signup = async (req, res, next) => {
             return res.status(400).send(error.details[0].message);
         }
 
-        const { email } = value;
+        const user = await UserModel.findOne({
+            $or: [
+                { userName: value.userName },
+                { email: value.email },
+                { phoneNumber: value.phoneNumber }
+            ]
+        });
 
-        const ifUserExists = await UserModel.findOne({ email });
-
-        if (ifUserExists) {
+        if (user) {
             return res.status(400).send("User has already signed up")
         }
 
@@ -27,7 +31,7 @@ export const signup = async (req, res, next) => {
             password: hashedPassword
         });
 
-        res.status(201).json({ message: "Registration successful!" });
+        res.status(201).json({ message: `${user.userName} registered successfully!` });
 
     } catch (error) {
         next(error);
@@ -64,7 +68,7 @@ export const login = async (req, res, next) => {
         req.session.user = { id: user.id }
 
         // log user in
-        res.status(200).json({ message: "User logged in" });
+        res.status(200).json({ message: `${user.userName} logged in` });
 
     } catch (error) {
         next(error);
@@ -106,7 +110,7 @@ export const token = async (req, res, next) => {
 
         // log user in
         res.status(200).json({
-            message: "User logged in",
+            message: `${user.userName} logged in`,
             accessToken: token
         })
 
