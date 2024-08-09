@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import "dotenv/config";
 import usersRoute from "./routes/usersRoute.js";
-import foodItemsRoute from "./routes/foodItemsRoute.js";
+import foodRoute from "./routes/foodRoute.js";
 import vendorsRoute from "./routes/vendorsRoute.js";
 import ordersRoute from "./routes/ordersRoute.js";
 
@@ -40,7 +40,7 @@ app.use(session({
 // use routes
 app.use("/api/v1", usersRoute);
 app.use("/api/v1", vendorsRoute);
-app.use("/api/v1", foodItemsRoute);
+app.use("/api/v1", foodRoute);
 app.use("/api/v1", ordersRoute);
 
 expressOasGenerator.handleRequests();
@@ -49,5 +49,5 @@ app.use((req, res) => res.redirect("/api-docs/"));
 const port = process.env.PORT || 8080;
 
 app.listen(port, () => {
-    console.log(`server is running on port ${port}`);
+    console.log(`server is running on port http://localhost:${port}`);
 });

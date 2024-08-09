@@ -12,11 +12,15 @@ export const signup = async (req, res, next) => {
             return res.status(400).send(error.details[0].message);
         }
 
-        const { email } = value;
+        const vendor = await VendorsModel.findOne({
+            $or: [
+                { businessName: value.businessName },
+                { email: value.email },
+                { phoneNumber: value.phoneNumber }
+            ]
+        });
 
-        const ifVendorExists = await VendorsModel.findOne({ email });
-
-        if (ifVendorExists) {
+        if (vendor) {
             return res.status(400).send("Vendor has already signed up, try logging in")
         }
 
@@ -27,7 +31,7 @@ export const signup = async (req, res, next) => {
             password: hashedPassword
         });
 
-        res.status(201).json({ message: "Registration successful!" });
+        res.status(201).json({ message: `${value.businessName} registered successfully!` });
 
     } catch (error) {
         next(error);
@@ -44,7 +48,7 @@ export const login = async (req, res, next) => {
 
         const vendor = await VendorsModel.findOne({
             $or: [
-                { userName: value.userName },
+                { businessName: value.businessName },
                 { email: value.email },
                 { phoneNumber: value.phoneNumber }
             ]
@@ -81,7 +85,7 @@ export const token = async (req, res, next) => {
 
         const vendor = await VendorsModel.findOne({
             $or: [
-                { userName: value.userName },
+                { businessName: value.businessName },
                 { email: value.email },
                 { phoneNumber: value.phoneNumber }
             ]
@@ -106,11 +110,23 @@ export const token = async (req, res, next) => {
 
         // log user in
         res.status(200).json({
-            message: "Vendor logged in",
+            message: `${vendor.businessName} logged in`,
             accessToken: token
         })
 
     } catch (error) {
         next(error)
+    }
+}
+
+export const logout = async (req, res, next) => {
+    try {
+        const vendor = await VendorsModel.find();
+
+        await req.session.destroy();
+
+        res.status(200).json({ message: `${vendor.businessName} successfully logged out` })
+    } catch (error) {
+        next(error);
     }
 }
