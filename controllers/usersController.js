@@ -12,26 +12,25 @@ export const signup = async (req, res, next) => {
             return res.status(400).send(error.details[0].message);
         }
 
-        const user = await UserModel.findOne({
+        const existingUser = await UserModel.findOne({
             $or: [
                 { userName: value.userName },
-                { email: value.email },
-                { phoneNumber: value.phoneNumber }
+                { email: value.email }
             ]
         });
 
-        if (user) {
+        if (existingUser) {
             return res.status(400).send("User has already signed up")
         }
 
-        const hashedPassword = bcrypt.hashSync(value.password, 10);
+        const hashedPassword = await bcrypt.hash(value.password, 10);
 
         await UserModel.create({
             ...value,
             password: hashedPassword
         });
 
-        res.status(201).json({ message: `${user.userName} registered successfully!` });
+        res.status(201).json({ message: `${value.userName || value.email || value.phoneNumber} registered successfully!` });
 
     } catch (error) {
         next(error);
@@ -40,17 +39,13 @@ export const signup = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     try {
-        const { error, value } = usersValidator.validate(req.body)
-
-        if (error) {
-            return res.status(400).send(error.details[0].message)
-        }
+        const { userName, email, phoneNumber, password } = req.body;
 
         const user = await UserModel.findOne({
             $or: [
-                { userName: value.userName },
-                { email: value.email },
-                { phoneNumber: value.phoneNumber }
+                { userName },
+                { email },
+                { phoneNumber }
             ]
         })
 
@@ -58,7 +53,7 @@ export const login = async (req, res, next) => {
             return res.status(404).json({ message: "User does not exist" });
         }
 
-        const correctPassword = bcrypt.compareSync(value.password, user.password)
+        const correctPassword = await bcrypt.compare(password, user.password)
 
         if (!correctPassword) {
             return res.status(400).json({ message: "Invalid login credentials" });
@@ -68,7 +63,7 @@ export const login = async (req, res, next) => {
         req.session.user = { id: user.id }
 
         // log user in
-        res.status(200).json({ message: `${user.userName} logged in` });
+        res.status(200).json({ message: `${user.userName || user.email || user.phoneNumber} logged in` });
 
     } catch (error) {
         next(error);
@@ -77,17 +72,13 @@ export const login = async (req, res, next) => {
 
 export const token = async (req, res, next) => {
     try {
-        const { error, value } = usersValidator.validate(req.body);
-
-        if (error) {
-            return res.status(400).send(error.details[0].message);
-        }
+        const { userName, email, phoneNumber, password } = req.body;
 
         const user = await UserModel.findOne({
             $or: [
-                { userName: value.userName },
-                { email: value.email },
-                { phoneNumber: value.phoneNumber }
+                { userName },
+                { email },
+                { phoneNumber }
             ]
         });
 
@@ -95,7 +86,7 @@ export const token = async (req, res, next) => {
             return res.status(400).json({ message: "User does not exist" })
         }
 
-        const correctPassword = bcrypt.compare(value.password, user.password)
+        const correctPassword = await bcrypt.compare(password, user.password)
 
         if (!correctPassword) {
             return res.status(400).json({ message: "Invalid login credentials" })
@@ -110,9 +101,10 @@ export const token = async (req, res, next) => {
 
         // log user in
         res.status(200).json({
-            message: `${user.userName} logged in`,
+            message: `${user.userName || user.email || user.phoneNumber} logged in`,
             accessToken: token
         })
+        console.log(user.email);
 
     } catch (error) {
         next(error)

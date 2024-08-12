@@ -31,7 +31,7 @@ export const signup = async (req, res, next) => {
             password: hashedPassword
         });
 
-        res.status(201).json({ message: `${value.businessName} registered successfully!` });
+        res.status(201).json({ message: `${value.businessName || value.email || value.phoneNumber} registered successfully!` });
 
     } catch (error) {
         next(error);
@@ -40,17 +40,13 @@ export const signup = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     try {
-        const { error, value } = vendorsValidator.validate(req.body)
-
-        if (error) {
-            return res.status(400).send(error.details[0].message)
-        }
+        const { businessName, email, phoneNumber, password } = req.body;
 
         const vendor = await VendorsModel.findOne({
             $or: [
-                { businessName: value.businessName },
-                { email: value.email },
-                { phoneNumber: value.phoneNumber }
+                { businessName },
+                { email },
+                { phoneNumber }
             ]
         })
 
@@ -58,7 +54,7 @@ export const login = async (req, res, next) => {
             return res.status(404).json({ message: "Vendor does not exist, try signing up" });
         }
 
-        const correctPassword = await bcrypt.compare(value.password, vendor.password)
+        const correctPassword = await bcrypt.compare(password, vendor.password)
 
         if (!correctPassword) {
             return res.status(400).json({ message: "Invalid login credentials" });
@@ -68,7 +64,7 @@ export const login = async (req, res, next) => {
         req.session.vendor = { id: vendor._id };
 
         // log user in
-        res.status(200).json({ message: "Vendor logged in" });
+        res.status(200).json({ message: `${vendor.businessName || vendor.email || vendor.phoneNumber} logged in` });
 
     } catch (error) {
         next(error);
@@ -77,17 +73,13 @@ export const login = async (req, res, next) => {
 
 export const token = async (req, res, next) => {
     try {
-        const { error, value } = vendorsValidator.validate(req.body);
-
-        if (error) {
-            return res.status(400).send(error.details[0].message);
-        }
+        const { businessName, email, phoneNumber, password } = vendorsValidator.validate(req.body);
 
         const vendor = await VendorsModel.findOne({
             $or: [
-                { businessName: value.businessName },
-                { email: value.email },
-                { phoneNumber: value.phoneNumber }
+                { businessName },
+                { email },
+                { phoneNumber }
             ]
         });
 
@@ -95,7 +87,7 @@ export const token = async (req, res, next) => {
             return res.status(400).json({ message: "Vendor does not exist, try signing up" })
         }
 
-        const correctPassword = await bcrypt.compare(value.password, vendor.password);
+        const correctPassword = await bcrypt.compare(password, vendor.password);
 
         if (!correctPassword) {
             return res.status(400).json({ message: "Invalid login credentials" })
@@ -110,7 +102,7 @@ export const token = async (req, res, next) => {
 
         // log user in
         res.status(200).json({
-            message: `${vendor.businessName} logged in`,
+            message: `${vendor.businessName || vendor.email || vendor.phoneNumber} logged in`,
             accessToken: token
         })
 
