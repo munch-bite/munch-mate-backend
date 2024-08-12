@@ -9,8 +9,11 @@ const usersSchema = new Schema({
     email: { type: String, required: true, unique: true, lowercase: true },
     phoneNumber: { type: String },
     password: { type: String, required: true },
+    cartData: { type: Object, default: {} },
     role: { type: String, enum: ["customer"], default: "customer", required: true },
     resetToken: { type: String }
+}, {
+    minimize: false
 }, {
     timestamps: true
 });

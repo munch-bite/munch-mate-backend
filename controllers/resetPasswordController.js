@@ -17,7 +17,7 @@ export const resetPassword = async (req, res, next) => {
             return res.status(400).json({ message: "User does not exist" });
         }
 
-        // igenerate and save OTP
+        // generate and save OTP
         const otp = generateOTP()
         user.resetToken = otp;
         await user.save()
