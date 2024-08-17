@@ -6,11 +6,14 @@ const usersSchema = new Schema({
     middleName: { type: String },
     lastName: { type: String, required: true },
     userName: { type: String, unique: true, lowercase: true },
+    businessName: { type: String, unique: true, trim: true },
+    address: { type: String },
+    location: { type: String, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     phoneNumber: { type: String },
     password: { type: String, required: true },
     cartData: { type: Object, default: {} },
-    role: { type: String, enum: ["customer"], default: "customer", required: true },
+    role: { type: String, enum: ["customer", "vendor"], required: true },
     resetToken: { type: String }
 }, {
     minimize: false

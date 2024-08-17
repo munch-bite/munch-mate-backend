@@ -12,12 +12,35 @@ export const signup = async (req, res, next) => {
             return res.status(400).send(error.details[0].message);
         }
 
-        const existingUser = await UserModel.findOne({
-            $or: [
-                { userName: value.userName },
-                { email: value.email }
-            ]
-        });
+        const { userName, email, businessName, password, location, role } = value;
+
+        if (!["customer", "vendor"].includes(role)) {
+            return res.status(400).json({ message: "Invalid role specified" });
+        }
+
+        if (role === "vendor" && !businessName && !location) {
+            return res.status(400).json({ message: "Business name and location are required for vendors" });
+        }
+
+        if (role === "customer" && businessName) {
+            return res.status(400).json({ message: "Business name should not be provided for customers" });
+        }
+
+        // const existingUser = await UserModel.findOne({
+        //     $or: [
+        //         { userName },
+        //         { email },
+        //         { businessName }
+        //     ]
+        // });
+
+        // query condition
+        const queryCondition = {};
+        if (userName) queryCondition.userName = userName;
+        if (businessName) queryCondition.businessName = businessName;
+        if (email) queryCondition.email = email;
+
+        const existingUser = await UserModel.findOne(queryCondition);
 
         if (existingUser) {
             return res.status(400).send("User has already signed up")
@@ -30,7 +53,7 @@ export const signup = async (req, res, next) => {
             password: hashedPassword
         });
 
-        res.status(201).json({ message: `${value.userName || value.email || value.phoneNumber} registered successfully!` });
+        res.status(201).json({ message: `${value.userName || value.businessName || value.email || value.phoneNumber} registered successfully!` });
 
     } catch (error) {
         next(error);
@@ -39,24 +62,39 @@ export const signup = async (req, res, next) => {
 
 export const tokenLogin = async (req, res, next) => {
     try {
-        
-        const { userName, email, phoneNumber, password } = req.body;
-        
-        if (!email ) {
-           return res.status(400).json({ message: "email required" });
+
+        const { userName, businessName, email, phoneNumber, role, password } = req.body;
+
+        if (!password || !role) {
+            return res.status(400).json({ message: "Password and Role are required" });
         }
-        
-        if (!password) {
-            return res.status(400).json({ message: "Password required" });
+
+        if (!["customer", "vendor"].includes(role)) {
+            return res.status(400).json({ message: "Invalid role" });
         }
-        
+
         // query condition
-        const queryCondition = {};
-        if (userName) queryCondition.userName = userName;
-        if (email) queryCondition.email = email;
-        if (phoneNumber) queryCondition.phoneNumber = phoneNumber;
-        
-        const user = await UserModel.findOne(queryCondition);
+        let queryCondition = {};
+
+        if (role === "customer") {
+            if (!userName || !email) {
+                return res.status(400).json({ message: "For customers, a username or email is required to login" })
+            }
+
+            if (userName) queryCondition.userName = userName;
+            if (email) queryCondition.email = email;
+        } else if (role === "vendor") {
+            if (!businessName) {
+                return res.status(400).json({ message: "For vendors, your Business Name is required to login" });
+            }
+
+            queryCondition.businessName = businessName;
+        }
+
+        const user = await UserModel.findOne({
+            ...queryCondition,
+            role
+        });
 
         if (!user) {
             return res.status(400).json({ message: "User does not exist" });
@@ -98,16 +136,3 @@ export const logout = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
-
-
-// "firstName": "userfirstname",
- 
-// "lastName": "userlastname",
-// "userName": "someusername",
-// "email": "email@email.com",
-// "phoneNumber": "087475590440",
-
-// "password": "password1234",
-// "confirmPassword": "password1234",
-
-// "role": "customer"

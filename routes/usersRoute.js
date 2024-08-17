@@ -3,8 +3,8 @@ import { logout, signup, tokenLogin } from "../controllers/usersController.js";
 
 const usersRoute = Router();
 
-usersRoute.post("/users/auth/signup", signup);
-usersRoute.post("/users/auth/token/login", tokenLogin);
-usersRoute.post("/users/auth/logout", logout);
+usersRoute.post("/auth/signup", signup);
+usersRoute.post("/auth/token/login", tokenLogin);
+usersRoute.post("/auth/logout", logout);
 
 export default usersRoute;
