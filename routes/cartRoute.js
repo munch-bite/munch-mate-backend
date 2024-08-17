@@ -6,6 +6,6 @@ const cartRoute = Router();
 
 cartRoute.post("/add-to-cart", isAuthenticated, customerPermission, addToCart);
 cartRoute.get("/get-cart-items", isAuthenticated, customerPermission, getCartData);
-cartRoute.patch("remove-from-cart", isAuthenticated, customerPermission, removeFromCart);
+cartRoute.patch("/remove-from-cart", isAuthenticated, customerPermission, removeFromCart);
 
 export default cartRoute;
