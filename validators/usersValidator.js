@@ -5,9 +5,12 @@ export const usersValidator = joi.object({
     middleName: joi.string(),
     lastName: joi.string().required(),
     userName: joi.string(),
+    businessName: joi.string().min(3).max(50),
+    address: joi.string(),
+    location: joi.string(),
     email: joi.string().email().required(),
     phoneNumber: joi.string(),
-    role: joi.string().valid("customer").default("customer").required(),
+    role: joi.string().valid("customer", "vendor").required(),
     password: joi.string().min(4),
     confirmPassword: joi.ref("password")
 }).with("password", "confirmPassword");

@@ -1,6 +1,5 @@
 import { FoodModel } from "../models/foodModel.js";
 import { UserModel } from "../models/usersModel.js";
-import { VendorsModel } from "../models/vendorsModel.js";
 import { foodValidator } from "../validators/foodValidator.js";
 
 
@@ -17,7 +16,7 @@ export const addFood = async (req, res, next) => {
 
         const vendorSessionID = req.session?.user?.id || req.user?.id;
 
-        const findVendor = await VendorsModel.findById(vendorSessionID);
+        const findVendor = await UserModel.findById(vendorSessionID);
 
         if (!findVendor) {
             return res.status(404).json({ message: "Vendor not found" });

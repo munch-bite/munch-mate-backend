@@ -7,7 +7,6 @@ import cors from "cors";
 import "dotenv/config";
 import usersRoute from "./routes/usersRoute.js";
 import foodRoute from "./routes/foodRoute.js";
-import vendorsRoute from "./routes/vendorsRoute.js";
 import ordersRoute from "./routes/ordersRoute.js";
 import cartRoute from "./routes/cartRoute.js";
 
@@ -40,7 +39,6 @@ app.use(session({
 
 // use routes
 app.use("/api/v1", usersRoute);
-app.use("/api/v1", vendorsRoute);
 app.use("/api/v1", foodRoute);
 app.use("/api/v1", ordersRoute);
 app.use("/api/v1", cartRoute);
