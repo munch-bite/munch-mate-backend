@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 
 const cartSchema = new Schema({
@@ -17,3 +17,5 @@ const cartSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
 
 })
+
+export const CartModel = model("Cart", cartSchema);

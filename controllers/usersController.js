@@ -12,7 +12,7 @@ export const signup = async (req, res, next) => {
             return res.status(400).send(error.details[0].message);
         }
 
-        const { userName, email, businessName, password, location, role } = value;
+        const { email, businessName, password, phoneNumber, location, role } = value;
 
         if (!["customer", "vendor"].includes(role)) {
             return res.status(400).json({ message: "Invalid role specified" });
@@ -28,11 +28,14 @@ export const signup = async (req, res, next) => {
 
         // query condition
         const queryCondition = {};
-        if (userName) queryCondition.userName = userName;
         if (businessName) queryCondition.businessName = businessName;
         if (email) queryCondition.email = email;
+        if (role) queryCondition.role = role;
+        if (phoneNumber) queryCondition.phoneNumber = phoneNumber;
 
-        const existingUser = await UserModel.findOne(queryCondition);
+        const existingUser = await UserModel.findOne({
+            ...queryCondition
+        });
 
         if (existingUser) {
             return res.status(400).send("User has already signed up")
@@ -55,16 +58,15 @@ export const signup = async (req, res, next) => {
 export const tokenLogin = async (req, res, next) => {
     try {
 
-        const { userName, businessName, email, password } = req.body;
+        const { businessName, email, password } = req.body;
 
-        if (!password /* || !role */) {
-            return res.status(400).json({ message: "Password and Role are required" });
+        if (!password) {
+            return res.status(400).json({ message: "Password is required" });
         }
 
         // query condition
         let queryCondition = {};
 
-        if (userName) queryCondition.userName = userName;
         if (businessName) queryCondition.businessName = businessName;
         if (email) queryCondition.email = email;
 
