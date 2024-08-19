@@ -26,14 +26,6 @@ export const signup = async (req, res, next) => {
             return res.status(400).json({ message: "Business name should not be provided for customers" });
         }
 
-        // const existingUser = await UserModel.findOne({
-        //     $or: [
-        //         { userName },
-        //         { email },
-        //         { businessName }
-        //     ]
-        // });
-
         // query condition
         const queryCondition = {};
         if (userName) queryCondition.userName = userName;
@@ -46,7 +38,7 @@ export const signup = async (req, res, next) => {
             return res.status(400).send("User has already signed up")
         }
 
-        const hashedPassword = await bcrypt.hash(value.password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         await UserModel.create({
             ...value,
@@ -63,37 +55,22 @@ export const signup = async (req, res, next) => {
 export const tokenLogin = async (req, res, next) => {
     try {
 
-        const { userName, businessName, email, phoneNumber, role, password } = req.body;
+        const { userName, businessName, email, password } = req.body;
 
-        if (!password || !role) {
+        if (!password /* || !role */) {
             return res.status(400).json({ message: "Password and Role are required" });
-        }
-
-        if (!["customer", "vendor"].includes(role)) {
-            return res.status(400).json({ message: "Invalid role" });
         }
 
         // query condition
         let queryCondition = {};
 
-        if (role === "customer") {
-            if (!userName || !email) {
-                return res.status(400).json({ message: "For customers, a username or email is required to login" })
-            }
+        if (userName) queryCondition.userName = userName;
+        if (businessName) queryCondition.businessName = businessName;
+        if (email) queryCondition.email = email;
 
-            if (userName) queryCondition.userName = userName;
-            if (email) queryCondition.email = email;
-        } else if (role === "vendor") {
-            if (!businessName) {
-                return res.status(400).json({ message: "For vendors, your Business Name is required to login" });
-            }
-
-            queryCondition.businessName = businessName;
-        }
 
         const user = await UserModel.findOne({
-            ...queryCondition,
-            role
+            ...queryCondition
         });
 
         if (!user) {
